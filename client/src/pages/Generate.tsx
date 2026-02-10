@@ -1,12 +1,13 @@
 // import React from 'react'
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { colorSchemes, type AspectRatio, type IThumbnail } from "../assests/assets";
+import { colorSchemes, dummyThumbnails, type AspectRatio, type IThumbnail } from "../assests/assets";
 import SoftBackdrop from "../components/SoftBackdrop";
 import AspectRatioSelector from "../components/AspectRatioSelector";
 import StyleSelector from "../components/StyleSelector";
 import ColorSchemeSelector from "../components/ColorSchemeSelector";
+import PreviewPannel from "../components/PreviewPannel";
 
 const Generate = () => {
   const { id } = useParams();
@@ -20,7 +21,30 @@ const Generate = () => {
   const [colorSchemeId, setColorSchemeId] = useState<string>(colorSchemes[0].id)
   const [style, setStyle] = useState<ThumbnailStyle>("Bold & Graphic")
   const [styleDropdownOpen, setStyleDropdownOpen] = useState(false)
-   return (
+  
+  const handleGenerate=async()=>{}
+
+  const fetchThumbnail=async()=>{
+    if(id){
+      const thumbnail : any=dummyThumbnails.find((thumbnail)=>thumbnail._id === id);
+      setThumbnail(thumbnail)
+      setAdditionalDetails(thumbnail.user_prompt)
+      setTitle(thumbnail.title)
+      setColorSchemeId(thumbnail.color_scheme)
+      setAspectRatio(thumbnail.aspect_ratio)
+      setStyle(thumbnail.style)
+      setLoading(false)
+    }
+  }
+
+  useEffect(()=>{
+    if(id){
+      fetchThumbnail()
+    }
+  },[])
+  
+  return (
+
     <>
       <SoftBackdrop />
       <div className="pt-24 min-h-screen">
@@ -71,7 +95,7 @@ const Generate = () => {
 
                 {/* Button */}
                 {!id && (
-                  <button className="text-[15px] w-full py-3.5 rounded-xl font-medium bg-linear-to-b from-pink-500 to-pink-600 hover:from-pink-700 disabled:cursor-not-allowed transition-colors">
+                  <button onClick={handleGenerate} className="text-[15px] w-full py-3.5 rounded-xl font-medium bg-linear-to-b from-pink-500 to-pink-600 hover:from-pink-700 disabled:cursor-not-allowed transition-colors">
                     {loading ? "Generating ...." : "Generating Thumbnail"}
                   </button>
                 )}
@@ -79,7 +103,12 @@ const Generate = () => {
             </div>
 
             {/* Right Pannel */}
-            <div></div>
+            <div>
+              <div className="p-6 rounded-2xl bg-white/8 border border-white/10 shadow-xl">
+                <h2 className="text-lg font-semibold text-zinc-100 mb-4">Preview</h2>
+                <PreviewPannel thumbnail={thumbnail} isLoading={loading} aspectRatio={aspectRatio} />
+              </div>
+            </div>
           </div>
         </main>
       </div>
